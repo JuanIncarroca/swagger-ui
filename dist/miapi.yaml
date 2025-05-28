@@ -1,0 +1,64 @@
+openapi: 3.0.3
+info:
+  title: Mi API para la guía
+  version: 1.0.0
+  description: API que usa OAuth 2.0 Client Credentials Grant para autenticación.
+
+servers:
+  - url: https://api.miproyecto.com
+
+components:
+  securitySchemes:
+    OAuth2ClientCredentials:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.miproyecto.com/oauth/token
+          scopes: {}
+
+  schemas:
+    Producto:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 123
+        nombreProducto:
+          type: string
+          example: "Ejemplo Producto"
+        fechaCreacion:
+          type: string
+          format: date-time
+          example: "2025-05-28T15:30:00Z"
+      required:
+        - id
+        - nombreProducto
+        - fechaCreacion
+
+security:
+  - OAuth2ClientCredentials: []
+
+paths:
+  /productos/{id}:
+    get:
+      summary: Obtener un producto por ID
+      security:
+        - OAuth2ClientCredentials: []
+      parameters:
+        - name: id
+          in: path
+          description: ID del producto a obtener
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Producto encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Producto'
+        '401':
+          description: No autorizado - token inválido o faltante
+        '404':
+          description: Producto no encontrado
